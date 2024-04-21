@@ -67,10 +67,10 @@ public:
         return newRoot;
     }
 
-    void addConnection(AVLNode* airport, int distance, int cost) {;
-        this->airport.connections.push_back(airport);
-        this->airport.distances.push_back(distance);
-        this->airport.costs.push_back(cost);
+    void addConnection(AVLNode* origin, AVLNode* destination, int distance, int cost) {;
+        origin->airport.connections.push_back(destination);
+        origin->airport.distances.push_back(distance);
+        origin->airport.costs.push_back(cost);
     }
     AVLNode* insertAirport(Airport airport) {
         AVLNode* newNode = nullptr;

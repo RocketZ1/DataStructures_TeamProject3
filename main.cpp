@@ -8,7 +8,7 @@ void readCSV() {
     ifstream fileIn(R"(C:\Users\Zane\Desktop\Development\C++\DataStructures_TeamProject3\airports.csv)");
     string lineText;
     //Airport object
-    Airport airport;
+    AVLNode airports;
 
     // Get rid of column name line
     getline(fileIn, lineText);
@@ -28,7 +28,16 @@ void readCSV() {
         lineText = lineText.substr(distancePos+1, lineText.size()-distancePos);
         int cost = stoi(lineText);
 
-
+        // Create airport object
+        Airport origin;
+        origin.code = originAirport;
+        origin.city = originCity;
+        Airport destination;
+        destination.code = destinationAirport;
+        destination.city = destinationCity;
+        AVLNode* originNode = airports.insertAirport(origin);
+        AVLNode* destinationNode = airports.insertAirport(destination);
+        airports.addConnection(originNode, destinationNode, distance, cost);
         // Read all variables from file
 
 
