@@ -100,4 +100,12 @@ public:
             this->rightRotate();
         }
     }
+
+
 };
+
+struct SearchNode {
+    std::string code;
+    int distance;
+    bool visited;
+}

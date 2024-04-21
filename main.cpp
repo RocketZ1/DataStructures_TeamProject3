@@ -1,8 +1,11 @@
 #include <iostream>
 #include <fstream>
+#include <vector>
+#include <minheap.cpp>
 #include "AVL.cpp"
 
 using namespace std;
+#define MAX_DIST 5000;
 
 void readCSV() {
     ifstream fileIn(R"(C:\Users\Zane\Desktop\Development\C++\DataStructures_TeamProject3\airports.csv)");
@@ -43,7 +46,25 @@ void readCSV() {
     fileIn.close();
 }
 
+//Shortest paths:
 
+void shortestPath(std::string src, std::string dest) {
+    std::vector<SearchNode> nodes = new std::vector<SearchNode>(140); 
+    MinHeap heap = new MinHeap(140); //140 total airports
+    std::string curNode = src;
+    
+    for (int i = 0; i < nodes.size(); i++) {
+        nodes[i].distance = MAX_DIST;
+        nodes[i].visited = false;
+    }
+    distances[0] = 0;
+
+    int verticiesVisited = 0;
+    while (verticiesVisited < distances.size()) {
+        
+    }
+
+}
 
 int main(){
     readCSV();
