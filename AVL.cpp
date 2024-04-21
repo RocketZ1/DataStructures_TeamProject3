@@ -1,26 +1,11 @@
+#include "AVL.h"
+
 #include <vector>
 #include <iostream>
 #include <string>
 
+
 using namespace std;
-
-class AVLNode;
-
-struct Airport {
-    string code;
-    string city;
-    vector<AVLNode*> connections;
-    vector<int> distances;
-    vector<int> costs;
-};
-
-class AVLNode {
-public:
-    Airport airport;
-    AVLNode* left;
-    AVLNode* right;
-    int height;
-};
 
 int height(AVLNode* N) {
     if (N == NULL)
