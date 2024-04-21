@@ -1,14 +1,14 @@
 #include <iostream>
 #include <fstream>
-#include "AVL.cpp"
+#include "Graph.cpp"
 
 using namespace std;
 
-void readCSV() {
-    ifstream fileIn(R"(C:\Users\Zane\Desktop\Development\C++\DataStructures_TeamProject3\airports.csv)");
+Graph* readCSV() {
+    ifstream fileIn("C:\\Users\\JJord\\Team Project\\DataStructures_TeamProject3\\airports.csv");
     string lineText;
     //Airport object
-    AVLNode airports;
+    Graph* airports = new Graph();
 
     // Get rid of column name line
     getline(fileIn, lineText);
@@ -28,6 +28,7 @@ void readCSV() {
         lineText = lineText.substr(distancePos+1, lineText.size()-distancePos);
         int cost = stoi(lineText);
 
+        // Read all variables from file
         // Create airport object
         Airport origin;
         origin.code = originAirport;
@@ -35,21 +36,20 @@ void readCSV() {
         Airport destination;
         destination.code = destinationAirport;
         destination.city = destinationCity;
-        AVLNode* originNode = airports.insertAirport(origin);
-        AVLNode* destinationNode = airports.insertAirport(destination);
-        airports.addConnection(originNode, destinationNode, distance, cost);
-        // Read all variables from file
-
-
-
+        airports->addAirport(origin);
+        airports->addAirport(destination);
+        airports->addConnection(searchAirport(airports->getRoot(), origin.code), searchAirport(airports->getRoot(), destination.code), distance, cost);
     }
+    
     // Close the file
     fileIn.close();
+    return airports;
 }
 
 
 
 int main(){
-    readCSV();
+    Graph* airports = readCSV();
+    inorderTraversal(airports->getRoot());
     return 0;
 }

@@ -15,109 +15,112 @@ struct Airport {
 };
 
 class AVLNode {
-private:
+public:
     Airport airport;
     AVLNode* left;
     AVLNode* right;
     int height;
-public:
-    AVLNode() {
-        this->left = nullptr;
-        this->right = nullptr;
-        this->height = 0;
-    }
-    AVLNode(Airport airport) {
-        this->airport = airport;
-        this->left = nullptr;
-        this->right = nullptr;
-        this->height = 0;
-    }
-
-    Airport getAirport() {
-        return this->airport;
-    }
-    
-    int getHeight() {
-        return this->height;
-    }
-
-    int getBalanceFactor() {
-        return this->left->getHeight() - this->right->getHeight();
-    }
-
-    AVLNode* rightRotate() {
-        AVLNode* newRoot = this->left;
-        AVLNode* temp = newRoot->right;
-
-        newRoot->right = this;
-        this->left = temp;
-
-        this->height = 1 + max(this->left->getHeight(), this->right->getHeight());
-        newRoot->height = 1 + max(newRoot->left->getHeight(), newRoot->right->getHeight());
-
-        return newRoot;
-    }
-
-    AVLNode* leftRotate() {
-        AVLNode* newRoot = this->right;
-        AVLNode* temp = newRoot->left;
-
-        newRoot->left = this;
-        this->right = temp;
-
-        this->height = 1 + max(this->left->getHeight(), this->right->getHeight());
-        newRoot->height = 1 + max(newRoot->left->getHeight(), newRoot->right->getHeight());
-
-        return newRoot;
-    }
-
-    void addConnection(AVLNode* origin, AVLNode* destination, int distance, int cost) {;
-        origin->airport.connections.push_back(destination);
-        origin->airport.distances.push_back(distance);
-        origin->airport.costs.push_back(cost);
-    }
-    AVLNode* insertAirport(Airport airport) {
-        AVLNode* newNode = nullptr;
-        if (airport.code < this->airport.code) {
-            if (this->left == nullptr) {
-                this->left = new AVLNode(airport);
-                newNode = this->left;
-            } else {
-                this->left->insertAirport(airport);
-            }
-        } else if (airport.code > this->airport.code) {
-            if (this->right == nullptr) {
-                this->right = new AVLNode(airport);
-                newNode = this->right;
-            } else {
-                this->right->insertAirport(airport);
-            }
-        }
-        else {
-            return this;
-        }
-        this->height = 1 + max(this->left->getHeight(), this->right->getHeight());
-
-        int balanceFactor = this->getBalanceFactor();
-
-        if (balanceFactor > 1 && airport.code < this->left->airport.code) {
-            this->rightRotate();
-            return  newNode;
-        }
-        if (balanceFactor > 1 && airport.code > this->left->airport.code) {
-            this->left->leftRotate();
-            this->rightRotate();
-            return newNode;
-        }
-        if (balanceFactor < -1 && airport.code > this->right->airport.code) {
-            this->leftRotate();
-            return newNode;
-        }
-        if (balanceFactor < -1 && airport.code < this->right->airport.code) {
-            this->right->rightRotate();
-            this->leftRotate();
-            return newNode;
-        }
-        return newNode;
-    }
 };
+
+int height(AVLNode* N) {
+    if (N == NULL)
+        return 0;
+    return N->height;
+}
+
+int max(int a, int b) {
+    return (a > b) ? a : b;
+}
+
+AVLNode* newNode(Airport airport) {
+    AVLNode* node = new AVLNode();
+    node->airport = airport;
+    node->left = NULL;
+    node->right = NULL;
+    node->height = 1;
+    return(node);
+}
+
+AVLNode* rightRotate(AVLNode* y) {
+    AVLNode* x = y->left;
+    AVLNode* T2 = x->right;
+
+    x->right = y;
+    y->left = T2;
+
+    y->height = max(height(y->left), height(y->right)) + 1;
+    x->height = max(height(x->left), height(x->right)) + 1;
+
+    return x;
+}
+
+AVLNode* leftRotate(AVLNode* x) {
+    AVLNode* y = x->right;
+    AVLNode* T2 = y->left;
+
+    y->left = x;
+    x->right = T2;
+
+    x->height = max(height(x->left), height(x->right)) + 1;
+    y->height = max(height(y->left), height(y->right)) + 1;
+
+    return y;
+}
+
+int getBalance(AVLNode* N) {
+    if (N == NULL)
+        return 0;
+    return height(N->left) - height(N->right);
+}
+
+AVLNode* insertAirport(AVLNode* node, Airport airport) {
+    if (node == NULL)
+        return(newNode(airport));
+
+    if (airport.code < node->airport.code)
+        node->left = insertAirport(node->left, airport);
+    else if (airport.code > node->airport.code)
+        node->right = insertAirport(node->right, airport);
+    else
+        return node;
+
+    node->height = 1 + max(height(node->left), height(node->right));
+
+    int balance = getBalance(node);
+
+    if (balance > 1 && airport.code < node->left->airport.code)
+        return rightRotate(node);
+
+    if (balance < -1 && airport.code > node->right->airport.code)
+        return leftRotate(node);
+
+    if (balance > 1 && airport.code > node->left->airport.code) {
+        node->left = leftRotate(node->left);
+        return rightRotate(node);
+    }
+
+    if (balance < -1 && airport.code < node->right->airport.code) {
+        node->right = rightRotate(node->right);
+        return leftRotate(node);
+    }
+
+    return node;
+}
+
+AVLNode* searchAirport(AVLNode* node, string code) {
+    if (node == NULL || node->airport.code == code)
+        return node;
+
+    if (node->airport.code < code)
+        return searchAirport(node->right, code);
+
+    return searchAirport(node->left, code);
+}
+
+void inorderTraversal(AVLNode* root) {
+    if (root != NULL) {
+        inorderTraversal(root->left);
+        cout << root->airport.code << " ";
+        inorderTraversal(root->right);
+    }
+}
