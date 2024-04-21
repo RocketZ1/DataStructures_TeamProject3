@@ -1,7 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include "Graph.h"
-
+#include "minheap.cpp"
 using namespace std;
 
 Graph* readCSV() {
@@ -46,9 +46,27 @@ Graph* readCSV() {
     return airports;
 }
 
+/*
+void shortestPath(std::string src, std::string dest) {
+    std::vector<SearchNode>* nodes = new std::vector<SearchNode>(140); 
+    MinHeap* heap = new MinHeap(140); //140 total airports
+    std::string curNode = src;
+    
+    for (int i = 0; i < nodes.size(); i++) {
+        nodes[i].distance = MAX_DIST;
+        nodes[i].visited = false;
+    }
+    distances[0] = 0;
 
+    int verticiesVisited = 0;
+    while (verticiesVisited < distances.size()) {
+        
+    }
 
+}
+*/
 int main(){
+
     Graph* airports = readCSV();
     AVLNode* root = airports->getRoot();
     cout << root->airport.code << std::endl;
@@ -57,5 +75,9 @@ int main(){
     cout << root->airport.connections[0]->airport.city << std::endl;
     cout << root->airport.distances[0] << std::endl;
     cout << root->airport.costs[0] << std::endl;
+
+
+
+    delete heap;
     return 0;
 }
