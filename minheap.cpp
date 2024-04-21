@@ -42,4 +42,44 @@ class MinHeap {
         arr[i] = arr[j];
         arr[j] = temp;
     }
+
+    int MinHeap::minimum(int a, int indexa, int b, int indexb) {
+        if (a < b) {
+             return indexa;
+        }
+       
+        return indexb;
+    }
+
+    void percolateDown(int index) {
+        if ((2 * index + 1) <= heapSize) {
+
+            std::string min = minimum(arr[2 * index], 2 * index, arr[2 * index + 1], 2 * index + 1);
+
+            if (harr[index] > harr[min]) {
+                swap(index, min);
+                percolateDown(min);
+            }   
+        }
+
+        else if (heapSize == 2 * index) {
+            if (harr[index] > harr[2 * index]) {
+                swap(index, 2 * index);
+            }
+        }
+    }
+
+    std::string getMin() {
+        if (size <= 0) {
+            return "ERROR";
+        }
+
+        std::string min = arr[0];
+        arr[1] = arr[size];
+        size--;
+        percolateDown(1);
+        
+        return min;
+    }
+
 };
