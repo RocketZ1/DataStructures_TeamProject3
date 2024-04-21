@@ -26,7 +26,7 @@ public:
         this->right = nullptr;
         this->height = 0;
     }
-    AVLNode(Airport airport) {
+    AVLNode(Airport &airport) {
         this->airport = airport;
         this->left = nullptr;
         this->right = nullptr;

@@ -38,10 +38,6 @@ void readCSV() {
         AVLNode* originNode = airports.insertAirport(origin);
         AVLNode* destinationNode = airports.insertAirport(destination);
         airports.addConnection(originNode, destinationNode, distance, cost);
-        // Read all variables from file
-
-
-
     }
     // Close the file
     fileIn.close();
