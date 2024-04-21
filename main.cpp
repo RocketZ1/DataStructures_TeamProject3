@@ -50,6 +50,12 @@ Graph* readCSV() {
 
 int main(){
     Graph* airports = readCSV();
-    inorderTraversal(airports->getRoot());
+    AVLNode* root = airports->getRoot();
+    cout << root->airport.code << std::endl;
+    cout << root->airport.city << std::endl;
+    cout << root->airport.connections[0]->airport.code << std::endl;
+    cout << root->airport.connections[0]->airport.city << std::endl;
+    cout << root->airport.distances[0] << std::endl;
+    cout << root->airport.costs[0] << std::endl;
     return 0;
 }
