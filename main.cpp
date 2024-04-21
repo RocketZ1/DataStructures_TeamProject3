@@ -7,11 +7,12 @@
 using namespace std;
 #define MAX_DIST 5000;
 
-void readCSV() {
+// Returns the AVL Graph
+AVLNode* readCSV() {
     ifstream fileIn(R"(C:\Users\Zane\Desktop\Development\C++\DataStructures_TeamProject3\airports.csv)");
     string lineText;
     //Airport object
-    AVLNode airports;
+    AVLNode* airports = new AVLNode();
 
     // Get rid of column name line
     getline(fileIn, lineText);
@@ -31,6 +32,8 @@ void readCSV() {
         lineText = lineText.substr(distancePos+1, lineText.size()-distancePos);
         int cost = stoi(lineText);
 
+
+
         // Create airport object
         Airport origin;
         origin.code = originAirport;
@@ -38,12 +41,14 @@ void readCSV() {
         Airport destination;
         destination.code = destinationAirport;
         destination.city = destinationCity;
-        AVLNode* originNode = airports.insertAirport(origin);
-        AVLNode* destinationNode = airports.insertAirport(destination);
-        airports.addConnection(originNode, destinationNode, distance, cost);
+
+        AVLNode* originNode = airports->insertAirport(origin);
+        AVLNode* destinationNode = airports->insertAirport(destination);
+        airports->addConnection(originNode, destinationNode, distance, cost);
     }
     // Close the file
     fileIn.close();
+    return airports;
 }
 
 //Shortest paths:
@@ -65,8 +70,28 @@ void shortestPath(std::string src, std::string dest) {
     }
 
 }
+void printAVLTree(AVLNode *airports){
+    // Height Display
+    for(int i = 0; i < airports->getHeight(); i++){
+        cout << "-";
+    }
+    cout << airports->getAirport().code << endl;
+    if(airports->getLeft() != nullptr){
+        cout << "L";
+        printAVLTree(airports->getLeft());
+    }
+    if(airports->getRight() != nullptr){
+        cout << "R";
+        printAVLTree(airports->getRight());
+    }
+}
+
 
 int main(){
-    readCSV();
+    // Builds the AVL Graph from the CSV data
+    AVLNode* airports = readCSV();
+    printAVLTree(airports);
+
+
     return 0;
 }
