@@ -33,6 +33,10 @@ public:
         this->height = 0;
     }
 
+    Airport getAirport() {
+        return this->airport;
+    }
+    
     int getHeight() {
         return this->height;
     }
@@ -96,8 +100,24 @@ public:
 
         int balanceFactor = this->getBalanceFactor();
 
-        if (balanceFactor > 1) {
+        if (balanceFactor > 1 && airport.code < this->left->airport.code) {
             this->rightRotate();
+            return  newNode;
         }
+        if (balanceFactor > 1 && airport.code > this->left->airport.code) {
+            this->left->leftRotate();
+            this->rightRotate();
+            return newNode;
+        }
+        if (balanceFactor < -1 && airport.code > this->right->airport.code) {
+            this->leftRotate();
+            return newNode;
+        }
+        if (balanceFactor < -1 && airport.code < this->right->airport.code) {
+            this->right->rightRotate();
+            this->leftRotate();
+            return newNode;
+        }
+        return newNode;
     }
 };
