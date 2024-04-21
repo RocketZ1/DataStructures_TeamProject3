@@ -3,12 +3,17 @@
 #include "Graph.h"
 #include "minheap.cpp"
 using namespace std;
+struct Graphs {
+    Graph* airports;
+    Graph* undirectedAirports;
+};
 
-Graph* readCSV() {
+Graphs readCSV() {
     ifstream fileIn("C:\\Users\\JJord\\Team Project\\DataStructures_TeamProject3\\airports.csv");
     string lineText;
     //Airport object
     Graph* airports = new Graph();
+    Graph* undirectedAirports = new Graph();
 
     // Get rid of column name line
     getline(fileIn, lineText);
@@ -39,11 +44,15 @@ Graph* readCSV() {
         airports->addAirport(origin);
         airports->addAirport(destination);
         airports->addConnection(searchAirport(airports->getRoot(), origin.code), searchAirport(airports->getRoot(), destination.code), distance, cost);
+        undirectedAirports->addAirport(origin);
+        undirectedAirports->addAirport(destination);
+        undirectedAirports->addConnectionUndirected(searchAirport(undirectedAirports->getRoot(), origin.code), searchAirport(undirectedAirports->getRoot(), destination.code), distance, cost);
     }
     
     // Close the file
     fileIn.close();
-    return airports;
+    Graphs graphs =  {airports, undirectedAirports};
+    return graphs;
 }
 
 /*
@@ -67,8 +76,17 @@ void shortestPath(std::string src, std::string dest) {
 */
 int main(){
 
-    Graph* airports = readCSV();
+    Graphs graphs = readCSV();
+    Graph* airports = graphs.airports;
+    Graph* undirectedAirports = graphs.undirectedAirports;
     AVLNode* root = airports->getRoot();
+    cout << root->airport.code << std::endl;
+    cout << root->airport.city << std::endl;
+    cout << root->airport.connections[0]->airport.code << std::endl;
+    cout << root->airport.connections[0]->airport.city << std::endl;
+    cout << root->airport.distances[0] << std::endl;
+    cout << root->airport.costs[0] << std::endl;
+    root = undirectedAirports->getRoot();
     cout << root->airport.code << std::endl;
     cout << root->airport.city << std::endl;
     cout << root->airport.connections[0]->airport.code << std::endl;
@@ -78,6 +96,5 @@ int main(){
 
 
 
-    delete heap;
     return 0;
 }
