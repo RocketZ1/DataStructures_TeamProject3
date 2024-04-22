@@ -68,6 +68,12 @@ public:
             std::cout << "Heap is empty" << std::endl;
             return -1;
         }
+        
+        while(arr[0].visited) {
+            arr[0] = arr[size - 1];
+            size--;
+            percolateDown(0);
+        }
 
         int min = arr[0].distance;
         arr[0] = arr[size - 1];
@@ -76,4 +82,33 @@ public:
 
         return min;
     }
+
+    SearchNode popMin() {
+        if (size <= 0) {
+            std::cout << "Heap is empty" << std::endl;
+            return SearchNode();
+        }
+
+        while(arr[0].visited) {
+            arr[0] = arr[size - 1];
+            size--;
+            percolateDown(0);
+        }
+
+        SearchNode min = arr[0];
+        arr[0] = arr[size - 1];
+        size--;
+        percolateDown(0);
+
+        return min;
+    }
+    void visit (string code) {
+        for (int i = 0; i < size; i++) {
+            if (arr[i].code == code) {
+                arr[i].visited = true;
+                return;
+            }
+        }
+    }
+
 };

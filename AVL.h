@@ -42,4 +42,6 @@ AVLNode* searchAirport(AVLNode* node, string code);
 
 void inorderTraversal(AVLNode* root);
 
+int size(AVLNode* root);
+
 #endif

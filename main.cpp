@@ -116,8 +116,24 @@ void totalFlightConnections(Graph* graph, AVLNode* root){
 
 Graph* primsAlgorithm(Graph airports) {
     Graph* mst = new Graph();
+    int cost = 0;
     AVLNode* root = airports.getRoot();
-    MinHeap* heap = new MinHeap(140);
+    int totalAirports = size(root);
+    MinHeap* heap = new MinHeap(totalAirports);
+    SearchNode min;
+    heap->insert(root->airport.code, 0);
+    while(heap->size != 0) {
+        min = heap->popMin();
+        cost += min.distance;
+        mst->addAirport(root->airport);
+        mst->addConnectionUndirected(searchAirport(mst->getRoot(), min.code), root, min.distance, 0);
+        root = searchAirport(airports.getRoot(), min.code);
+        heap->visit(min.code);        
+        for(int i = 0; i < root->airport.connections.size(); i++) {
+            heap->insert(root->airport.connections[i]->airport.code, root->airport.costs[i]);
+        }
+    }
+    return mst;
 }
 
 int main(){
