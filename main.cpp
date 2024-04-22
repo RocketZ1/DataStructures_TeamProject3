@@ -114,6 +114,12 @@ void totalFlightConnections(Graph* graph, AVLNode* root){
 //
 //}
 
+Graph* primsAlgorithm(Graph airports) {
+    Graph* mst = new Graph();
+    AVLNode* root = airports.getRoot();
+    MinHeap* heap = new MinHeap(140);
+}
+
 int main(){
     Graphs graphs = readCSV();
     Graph* airports = graphs.airports;
