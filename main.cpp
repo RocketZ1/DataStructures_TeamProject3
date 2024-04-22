@@ -9,8 +9,8 @@ struct Graphs {
 };
 
 // Returns the AVL Graph
-Graphs* readCSV() {
-    ifstream fileIn(R"(C:\Users\VenaFL\Downloads\DataStructures_TeamProject3\DataStructures_TeamProject3\airports.csv)");
+Graphs * readCSV() {
+    ifstream fileIn(R"(C:\Users\Zane\Desktop\Development\C++\DataStructures_TeamProject3\airports.csv)");
     string lineText;
     //Airport object
     Graph* airports = new Graph();
@@ -213,6 +213,28 @@ void shortestPath(std::string src, std::string dest, Graph* graph) {
 }
 
 
+Graph* primsAlgorithm(Graph airports) {
+    Graph* mst = new Graph();
+    int cost = 0;
+    AVLNode* root = airports.getRoot();
+    int totalAirports = size(root);
+    MinHeap* heap = new MinHeap(totalAirports);
+    SearchNode min;
+    heap->insert(root->airport.code, 0);
+    while(heap->size != 0) {
+        min = heap->popMin();
+        cost += min.distance;
+        mst->addAirport(root->airport);
+        mst->addConnectionUndirected(searchAirport(mst->getRoot(), min.code), root, min.distance, 0);
+        root = searchAirport(airports.getRoot(), min.code);
+        heap->visit(min.code);
+        for(int i = 0; i < root->airport.connections.size(); i++) {
+            heap->insert(root->airport.connections[i]->airport.code, root->airport.costs[i]);
+        }
+    }
+    return mst;
+}
+
 int main(){
     Graphs * graphs = readCSV();
     Graph* airports = graphs->airports;
@@ -232,6 +254,8 @@ int main(){
     cout << root->airport.distances[0] << std::endl;
     cout << root->airport.costs[0] << std::endl;
 
+
+
     totalFlightConnections(airports, root);
 //    cout << root->airport.code << std::endl;
 //    cout << root->airport.city << std::endl;
@@ -239,7 +263,5 @@ int main(){
 //    cout << root->airport.connections[0]->airport.city << std::endl;
 //    cout << root->airport.distances[0] << std::endl;
 //    cout << root->airport.costs[0] << std::endl;
-
-    shortestPath("MIA", "BOS", airports);
     return 0;
 }

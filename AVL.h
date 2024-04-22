@@ -44,4 +44,6 @@ void inorderTraversal(AVLNode* root);
 
 void pushAirportCodesToVector(AVLNode* root, std::vector<SearchNode>& v);
 
+int size(AVLNode* root);
+
 #endif
