@@ -9,7 +9,7 @@ struct Graphs {
 };
 
 // Returns the AVL Graph
-Graphs readCSV() {
+Graphs* readCSV() {
     ifstream fileIn("airports.csv");
     string lineText;
     //Airport object
@@ -52,7 +52,7 @@ Graphs readCSV() {
     
     // Close the file
     fileIn.close();
-    Graphs graphs =  {airports, undirectedAirports};
+    Graphs * graphs = new Graphs{airports, undirectedAirports};
     return graphs;
 }
 
@@ -121,9 +121,9 @@ Graph* primsAlgorithm(Graph airports) {
 }
 
 int main(){
-    Graphs graphs = readCSV();
-    Graph* airports = graphs.airports;
-    Graph* undirectedAirports = graphs.undirectedAirports;
+    Graphs * graphs = readCSV();
+    Graph* airports = graphs->airports;
+    Graph* undirectedAirports = graphs->undirectedAirports;
     AVLNode* root = airports->getRoot();
     cout << root->airport.code << std::endl;
     cout << root->airport.city << std::endl;
