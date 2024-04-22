@@ -9,7 +9,7 @@ struct Graphs {
 };
 
 // Returns the AVL Graph
-Graph* readCSV() {
+Graphs * readCSV() {
     ifstream fileIn(R"(C:\Users\Zane\Desktop\Development\C++\DataStructures_TeamProject3\airports.csv)");
     string lineText;
     //Airport object
@@ -52,7 +52,7 @@ Graph* readCSV() {
     
     // Close the file
     fileIn.close();
-    Graphs graphs =  {airports, undirectedAirports};
+    Graphs * graphs = new Graphs{airports, undirectedAirports};
     return graphs;
 }
 
@@ -115,9 +115,9 @@ void totalFlightConnections(Graph* graph, AVLNode* root){
 //}
 
 int main(){
-    Graphs graphs = readCSV();
-    Graph* airports = graphs.airports;
-    Graph* undirectedAirports = graphs.undirectedAirports;
+    Graphs * graphs = readCSV();
+    Graph* airports = graphs->airports;
+    Graph* undirectedAirports = graphs->undirectedAirports;
     AVLNode* root = airports->getRoot();
     cout << root->airport.code << std::endl;
     cout << root->airport.city << std::endl;
