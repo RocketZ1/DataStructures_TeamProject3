@@ -9,8 +9,8 @@ struct Graphs {
 };
 
 // Returns the AVL Graph
-Graph* readCSV() {
-    ifstream fileIn(R"(C:\Users\Zane\Desktop\Development\C++\DataStructures_TeamProject3\airports.csv)");
+Graphs readCSV() {
+    ifstream fileIn("airports.csv");
     string lineText;
     //Airport object
     Graph* airports = new Graph();
