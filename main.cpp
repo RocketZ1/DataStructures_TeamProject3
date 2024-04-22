@@ -95,6 +95,25 @@ void totalFlightConnections(Graph* graph, AVLNode* root){
 
 // End prompt #5
 
+//void shortestPath(std::string src, std::string dest) {
+//    std::vector<SearchNode> nodes(140); //140 total airports
+//    MinHeap* heap = new MinHeap(140);
+//    std::string curNode = src;
+//
+//    for (int i = 0; i < nodes.size(); i++) {
+//        nodes[i].distance = MAX_DIST;
+//        nodes[i].visited = false;
+//    }
+//
+//    nodes[0].distance = 0;
+//
+//    int verticiesVisited = 0;
+//    while (verticiesVisited < distances.size()) {
+//
+//    }
+//
+//}
+
 int main(){
     Graphs graphs = readCSV();
     Graph* airports = graphs.airports;
