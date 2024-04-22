@@ -3,7 +3,7 @@
 
 #include <string>
 #include <vector>
-
+#include "minheap.cpp"
 using namespace std;
 
 class AVLNode;
@@ -41,5 +41,7 @@ AVLNode* insertAirport(AVLNode* node, Airport airport);
 AVLNode* searchAirport(AVLNode* node, string code);
 
 void inorderTraversal(AVLNode* root);
+
+void pushAirportCodesToVector(AVLNode* root, std::vector<SearchNode>& v);
 
 #endif

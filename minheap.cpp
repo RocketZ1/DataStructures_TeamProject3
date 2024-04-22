@@ -30,7 +30,7 @@ public:
             return;
         }
 
-        arr[size].code = std::move(str);
+        arr[size].code = str;
         arr[size].distance = dist;
         size++;
 
@@ -63,17 +63,21 @@ public:
         }
     }
 
-    int getMin() {
+    SearchNode getMin() {
         if (size <= 0) {
             std::cout << "Heap is empty" << std::endl;
-            return -1;
+            throw 505;
         }
 
-        int min = arr[0].distance;
+        SearchNode minNode = arr[0];
         arr[0] = arr[size - 1];
         size--;
         percolateDown(0);
 
-        return min;
+        return minNode;
+    }
+
+    bool isEmpty() {
+        return (size <= 0);
     }
 };

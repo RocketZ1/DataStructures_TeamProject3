@@ -97,8 +97,8 @@ AVLNode* searchAirport(AVLNode* node, string code) {
 
     if (node->airport.code < code)
         return searchAirport(node->right, code);
-
-    return searchAirport(node->left, code);
+    else
+        return searchAirport(node->left, code);
 }
 
 void inorderTraversal(AVLNode* root) {
@@ -106,6 +106,16 @@ void inorderTraversal(AVLNode* root) {
         inorderTraversal(root->left);
         cout << root->airport.code << " ";
         inorderTraversal(root->right);
+    }
+}
+
+void pushAirportCodesToVector(AVLNode* root, std::vector<SearchNode>& v) {
+    if (root != NULL) {
+        pushAirportCodesToVector(root->left, v);
+        SearchNode node;
+        node.code = root->airport.code;
+        v.push_back(node);
+        pushAirportCodesToVector(root->right,v);
     }
 }
 
