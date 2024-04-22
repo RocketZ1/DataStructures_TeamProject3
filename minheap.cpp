@@ -1,85 +1,79 @@
 #include <string>
 #include <iostream>
+#include <utility>
+
+struct SearchNode {
+    std::string code;
+    int distance{};
+    bool visited{};
+};
 
 class MinHeap {
-    std::string* arr;
+public:
+    SearchNode* arr;
     int capacity;
     int size;
-
-    public:
 
     MinHeap(int capacity) {
         this->capacity = capacity;
         size = 0;
-        arr = new std::string[capacity];
+        arr = new SearchNode[capacity];
     }
 
-    void insert(std::string str) {
+    ~MinHeap() {
+        delete[] arr;
+    }
+
+    void insert(std::string str, int dist) {
         if (size == capacity) {
-            std::cout << " Minheap Overflow" << std::endl;
+            std::cout << "Minheap Overflow" << std::endl;
             return;
         }
 
+        arr[size].code = std::move(str);
+        arr[size].distance = dist;
         size++;
-        arr[size] = str;
 
-        percolateUp(size);
+        percolateUp(size - 1);
     }
 
     void percolateUp(int index) {
-        if (index < 1) {
-            return;
+        while (index > 0 && arr[(index - 1) / 2].distance > arr[index].distance) {
+            swap(index, (index - 1) / 2);
+            index = (index - 1) / 2;
         }
-
-        if (arr[index / 2] > arr[index]) {
-            swap(index, index / 2);
-            percolateUp(index / 2);
-        } 
     }
 
     void swap(int i, int j) {
-        int temp = harr[i];
+        SearchNode temp = arr[i];
         arr[i] = arr[j];
         arr[j] = temp;
     }
 
-    int MinHeap::minimum(int a, int indexa, int b, int indexb) {
-        if (a < b) {
-             return indexa;
-        }
-       
-        return indexb;
+    int minimum(int a, int indexa, int b, int indexb) {
+        return (a < b) ? indexa : indexb;
     }
 
     void percolateDown(int index) {
-        if ((2 * index + 1) <= heapSize) {
-
-            std::string min = minimum(arr[2 * index], 2 * index, arr[2 * index + 1], 2 * index + 1);
-
-            if (harr[index] > harr[min]) {
-                swap(index, min);
-                percolateDown(min);
-            }   
-        }
-
-        else if (heapSize == 2 * index) {
-            if (harr[index] > harr[2 * index]) {
-                swap(index, 2 * index);
-            }
+        while (2 * index + 1 < size) {
+            int minChildIndex = minimum(arr[2 * index + 1].distance, 2 * index + 1, arr[2 * index + 2].distance, 2 * index + 2);
+            if (arr[index].distance <= arr[minChildIndex].distance) break;
+            swap(index, minChildIndex);
+            index = minChildIndex;
         }
     }
 
-    std::string getMin() {
+    int getMin() {
         if (size <= 0) {
-            return "ERROR";
+            std::cout << "Heap is empty" << std::endl;
+            return -1;
         }
 
-        std::string min = arr[0];
-        arr[1] = arr[size];
+        int min = arr[0].distance;
+        arr[0] = arr[size - 1];
         size--;
-        percolateDown(1);
-        
+        percolateDown(0);
+
         return min;
     }
-
 };

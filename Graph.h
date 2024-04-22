@@ -13,6 +13,7 @@ public:
     AVLNode* getRoot();
     void addConnection(AVLNode* origin, AVLNode* destination, int distance, int cost);
     void addAirport(Airport airport);
+    void addConnectionUndirected(AVLNode* origin, AVLNode* destination, int distance, int cost);
 };
 
 #endif

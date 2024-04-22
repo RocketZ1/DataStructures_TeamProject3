@@ -1,15 +1,20 @@
 #include <iostream>
 #include <fstream>
 #include "Graph.h"
-
+#include "minheap.cpp"
 using namespace std;
+struct Graphs {
+    Graph* airports;
+    Graph* undirectedAirports;
+};
 
 // Returns the AVL Graph
 Graph* readCSV() {
-    ifstream fileIn(R"(C:\Users\VenaFL\Downloads\DataStructures_TeamProject3\DataStructures_TeamProject3\airports.csv)");
+    ifstream fileIn(R"(C:\Users\Zane\Desktop\Development\C++\DataStructures_TeamProject3\airports.csv)");
     string lineText;
     //Airport object
     Graph* airports = new Graph();
+    Graph* undirectedAirports = new Graph();
 
     // Get rid of column name line
     getline(fileIn, lineText);
@@ -40,11 +45,15 @@ Graph* readCSV() {
         airports->addAirport(origin);
         airports->addAirport(destination);
         airports->addConnection(searchAirport(airports->getRoot(), origin.code), searchAirport(airports->getRoot(), destination.code), distance, cost);
+        undirectedAirports->addAirport(origin);
+        undirectedAirports->addAirport(destination);
+        undirectedAirports->addConnectionUndirected(searchAirport(undirectedAirports->getRoot(), origin.code), searchAirport(undirectedAirports->getRoot(), destination.code), distance, cost);
     }
-
+    
     // Close the file
     fileIn.close();
-    return airports;
+    Graphs graphs =  {airports, undirectedAirports};
+    return graphs;
 }
 
 // Prompt #5
@@ -86,29 +95,27 @@ void totalFlightConnections(Graph* graph, AVLNode* root){
 
 // End prompt #5
 
-//void shortestPath(std::string src, std::string dest) {
-//    std::vector<SearchNode> nodes(140); //140 total airports
-//    MinHeap* heap = new MinHeap(140);
-//    std::string curNode = src;
-//
-//    for (int i = 0; i < nodes.size(); i++) {
-//        nodes[i].distance = MAX_DIST;
-//        nodes[i].visited = false;
-//    }
-//
-//    nodes[0].distance = 0;
-//
-//    int verticiesVisited = 0;
-//    while (verticiesVisited < distances.size()) {
-//
-//    }
-//
-//}
-
-
 int main(){
-    Graph* airports = readCSV();
+    Graphs graphs = readCSV();
+    Graph* airports = graphs.airports;
+    Graph* undirectedAirports = graphs.undirectedAirports;
     AVLNode* root = airports->getRoot();
+    cout << root->airport.code << std::endl;
+    cout << root->airport.city << std::endl;
+    cout << root->airport.connections[0]->airport.code << std::endl;
+    cout << root->airport.connections[0]->airport.city << std::endl;
+    cout << root->airport.distances[0] << std::endl;
+    cout << root->airport.costs[0] << std::endl;
+    root = undirectedAirports->getRoot();
+    cout << root->airport.code << std::endl;
+    cout << root->airport.city << std::endl;
+    cout << root->airport.connections[0]->airport.code << std::endl;
+    cout << root->airport.connections[0]->airport.city << std::endl;
+    cout << root->airport.distances[0] << std::endl;
+    cout << root->airport.costs[0] << std::endl;
+
+
+
     totalFlightConnections(airports, root);
 //    cout << root->airport.code << std::endl;
 //    cout << root->airport.city << std::endl;
