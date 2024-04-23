@@ -12,7 +12,7 @@ struct Graphs {
 
 // Returns the AVL Graph
 Graphs * readCSV() {
-    ifstream fileIn("airports.csv");
+    ifstream fileIn(R"(C:\Users\Zane\Desktop\Development\C++\DataStructures_TeamProject3\airports.csv)");
     string lineText;
     //Airport object
     Graph* airports = new Graph();
@@ -77,34 +77,30 @@ struct totalFlightConnectionHelperStruct {
     string code;
     vector<AVLNode*> outboundAirports;
     vector<AVLNode*> *inboundAirports;
+    bool beenPrinted = false;
 };
 
 totalFlightConnectionHelperStruct* totalFlightConnectionsHelper(Graph* graph, AVLNode* root, vector<totalFlightConnectionHelperStruct*>* flightConnectionsContainer){
     if (root != nullptr && !root->airport.code.empty()) {
         totalFlightConnectionsHelper(graph, root->left, flightConnectionsContainer);
 
-        if(root->airport.code == "BOS"){
-            cout << "";
-        }
-
-        cout << root->airport.code << endl;
         vector<AVLNode*> outboundAirports = root->airport.connections;
         vector<AVLNode*> *inboundAirports = new vector<AVLNode*>;
         findConnections(graph->getRoot(), inboundAirports, root->airport.code);
         totalFlightConnectionHelperStruct* container = new totalFlightConnectionHelperStruct
-                {root->airport.code, outboundAirports, inboundAirports};
+                {root->airport.code, outboundAirports, inboundAirports, false};
         flightConnectionsContainer->push_back(container);
-
-        cout << "Outbound Flights: ";
-        for(AVLNode * outboundAirport : outboundAirports){
-            cout << outboundAirport->airport.code << " ";
-        }
-        cout << endl;
-        cout << "Inbound Flights: ";
-        for(AVLNode * inboundAirport : *inboundAirports) {
-            cout << inboundAirport->airport.code << " ";
-        }
-        cout << endl << endl;
+        // Debug text
+//        cout << "Outbound Flights: ";
+//        for(AVLNode * outboundAirport : outboundAirports){
+//            cout << outboundAirport->airport.code << " ";
+//        }
+//        cout << endl;
+//        cout << "Inbound Flights: ";
+//        for(AVLNode * inboundAirport : *inboundAirports) {
+//            cout << inboundAirport->airport.code << " ";
+//        }
+//        cout << endl << endl;
         totalFlightConnectionsHelper(graph, root->right, flightConnectionsContainer);
     }
 }
@@ -112,7 +108,27 @@ totalFlightConnectionHelperStruct* totalFlightConnectionsHelper(Graph* graph, AV
 void totalFlightConnections(Graph* graph, AVLNode* root){
     vector<totalFlightConnectionHelperStruct*>* flightConnections = new vector<totalFlightConnectionHelperStruct*>;
     totalFlightConnectionsHelper(graph, root, flightConnections);
-    cout << flightConnections->size();
+    vector<string> printedAirports;
+    totalFlightConnectionHelperStruct* largestAirport = flightConnections[0][0];
+    cout << "Airport\t\tConnections"<<endl;
+    while(printedAirports.size() < flightConnections->size()){
+        for(int i = 0; i < flightConnections->size(); i++){
+            if(flightConnections[0][i]->beenPrinted) continue;
+            int tripSize = flightConnections[0][i]->outboundAirports.size() + flightConnections[0][i]->inboundAirports->size();
+            if(largestAirport->inboundAirports->size()+largestAirport->outboundAirports.size() < tripSize){
+                largestAirport = flightConnections[0][i];
+            }
+        }
+
+        cout << largestAirport->code << "\t\t" << largestAirport->outboundAirports.size() + largestAirport->inboundAirports->size()<<endl;
+        printedAirports.push_back(largestAirport->code);
+        largestAirport->beenPrinted = true;
+        // reset for next loop
+        for(int i = 0; i < flightConnections->size(); i++){
+            if(flightConnections[0][i]->beenPrinted) continue;
+            largestAirport = flightConnections[0][i];
+        }
+    }
 }
 
 // End prompt #5
@@ -457,7 +473,7 @@ void prim(Graph* graph) {
     while (!heap->isEmpty()) {
         // Get the minimum edge
         SearchNode minNode = heap->getMin();
-        
+
         string origin = minNode.origin;
         string dest = minNode.code;
         // If the destination has not been visited, add it to the MST
@@ -472,7 +488,7 @@ void prim(Graph* graph) {
                     heap->insert(curNode->airport.connections[i]->airport.code, curNode->airport.code, curNode->airport.costs[i]);
                 }
             }
-            
+
         }
     }
     int total = 0;
@@ -503,11 +519,17 @@ int main(){
     Graphs* graphs = readCSV();
     Graph* airports = graphs->airports;
     Graph* undirectedAirports = graphs->undirectedAirports;
+    AVLNode* root = airports->getRoot();
+    totalFlightConnections(airports, root);
 
     shortestPathToState("MIA", "IL", airports);
     prim(undirectedAirports);
-    
-    
-    
+
+
+
+    //shortestPathWithStops("MIA", "DTW", 3, airports);
+    //shortestPathToState("MIA", "IL", airports);
+
+
     return 0;
 }
