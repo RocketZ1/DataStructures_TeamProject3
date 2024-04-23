@@ -6,6 +6,7 @@ struct SearchNode {
     std::string code;
     int distance{};
     bool visited{};
+    int stops{};
 };
 
 class MinHeap {
