@@ -1,4 +1,5 @@
 #include <iostream>
+#include <iomanip>
 #include <fstream>
 #include <algorithm> //for std::reverse
 #include "Graph.h"
@@ -373,20 +374,20 @@ void shortestPathWithStops(std::string src, std::string dest, int numStops, Grap
 
 //End Shortest Path's
 
-
-
+// Prim's Algorithm
+// Edge struct to store the origin, destination, and weight of an edge to be used in the MST
 struct Edge {
     string origin, dest;
     int weight;
     Edge(string origin, string dest, int weight) : origin(origin), dest(dest), weight(weight) {}
 };
-
+// used to store visited vertices
 struct Visit {
     string vertex;
     bool visited;
     Visit(string vertex, bool visited) : vertex(vertex), visited(visited) {}
 };
-
+// Function to traverse the AVL tree and add the airport codes to the visited vector
 void traverseAndAdd(AVLNode* node, vector<Visit>& visited) {
     if (node == nullptr) {
         return;
@@ -397,7 +398,8 @@ void traverseAndAdd(AVLNode* node, vector<Visit>& visited) {
     traverseAndAdd(node->left, visited);
     traverseAndAdd(node->right, visited);
 }
-
+// Function to add the airport code to the visited vector / implement the traverseAndAdd function
+// Retruns a vector of Visit objects
 vector<Visit> addValuesToVisited(Graph* graph) {
     vector<Visit> visited;
 
@@ -407,7 +409,7 @@ vector<Visit> addValuesToVisited(Graph* graph) {
 
     return visited;
 }
-
+// Updates the visited vector to mark the vertex as visited
 void visit(vector<Visit>& visited, string vertex) {
     for (int i = 0; i < visited.size(); i++) {
         if (visited[i].vertex == vertex) {
@@ -416,7 +418,7 @@ void visit(vector<Visit>& visited, string vertex) {
         }
     }
 }
-
+// Checks if the vertex has been visited
 bool isVisited(vector<Visit>& visited, string vertex) {
     for (int i = 0; i < visited.size(); i++) {
         if (visited[i].vertex == vertex) {
@@ -425,7 +427,7 @@ bool isVisited(vector<Visit>& visited, string vertex) {
     }
     return false;
 }
-
+// Checks if all vertices have been visited to see if the graph is connected
 bool isAllVisited(vector<Visit>& visited) {
     for (int i = 0; i < visited.size(); i++) {
         if (!visited[i].visited) {
@@ -434,30 +436,37 @@ bool isAllVisited(vector<Visit>& visited) {
     }
     return true;
 }
-
+// Function to implement Prim's Algorithm
 void prim(Graph* graph) {
     AVLNode* root = graph->getRoot();
     int numVertices = size(root);
+    // Vector to store the MST
     vector<pair<pair<string, string>, int>> mst;
+    // Vector to store the visited vertices
     vector<Visit> visited;
+    // MinHeap to store the edges
     MinHeap* heap = new MinHeap(numVertices * numVertices);
+    // Insert all of the airport codes into the visited vector
     visited = addValuesToVisited(graph);
     visit(visited, root->airport.code);
-
+    // Insert all of the connections of the root node into the heap
     for (int i = 0; i < root->airport.connections.size(); i++) {
         heap->insert(root->airport.connections[i]->airport.code, root->airport.code, root->airport.costs[i]);
     }
+    // While the heap is not empty, get the minimum visible edge and add it to the MST
     while (!heap->isEmpty()) {
+        // Get the minimum edge
         SearchNode minNode = heap->getMin();
         
         string origin = minNode.origin;
         string dest = minNode.code;
-
+        // If the destination has not been visited, add it to the MST
         if (!isVisited(visited, dest)) {
             mst.push_back({{origin, dest}, minNode.distance});
             visit(visited, dest);
 
             AVLNode* curNode = searchAirport(graph->getRoot(), dest);
+            // Insert all of the connections of the current node into the heap
             for (int i = 0; i < curNode->airport.connections.size(); i++) {
                 if (!isVisited(visited, curNode->airport.connections[i]->airport.code)) {
                     heap->insert(curNode->airport.connections[i]->airport.code, curNode->airport.code, curNode->airport.costs[i]);
@@ -466,30 +475,36 @@ void prim(Graph* graph) {
             
         }
     }
-    cout << "Minimal Spanning Tree:" << endl;
     int total = 0;
-    for (int i = 0; i < mst.size(); i++) {
-        cout << mst[i].first.first << " - " << mst[i].first.second << " " << mst[i].second << endl;
-        total += mst[i].second;
-    }
-    cout << "Total cost of MST: " << total << endl;
-    if (!isAllVisited(visited)) {
-        cout << "The Graph Is Not Connected" << endl;
-    }
+
+cout << "Minimum Spanning Tree:" << endl;
+// Print the header with fixed width for each column
+cout << setw(14) << left << "Path" << "Weight" << endl;
+
+// Print each edge of the MST with fixed width for each column
+for (int i = 0; i < mst.size(); i++) {
+    cout << mst[i].first.first << " - " << setw(8) << left << mst[i].first.second << mst[i].second << endl;
+    total += mst[i].second;
+}
+
+// Print the total cost of the MST
+cout << "Total cost of MST: " << total << endl;
+
+// Check if the graph is not connected
+if (!isAllVisited(visited)) {
+    cout << "The Graph Is Not Connected" << endl;
+}
     return;
 }
 
-void printMST(vector<pair<pair<string, string>, int>> mst) {
-    for (int i = 0; i < mst.size(); i++) {
-        cout << mst[i].first.first << " " << mst[i].first.second << " " << mst[i].second << endl;
-    }
-}
+// End Prim's Algorithm
 
 int main(){
     Graphs* graphs = readCSV();
     Graph* airports = graphs->airports;
     Graph* undirectedAirports = graphs->undirectedAirports;
 
+    shortestPathToState("MIA", "IL", airports);
     prim(undirectedAirports);
     
     
