@@ -376,8 +376,9 @@ void shortestPathWithStops(std::string src, std::string dest, int numStops, Grap
 
 
 struct Edge {
-    int dest, weight;
-    Edge(int dest, int weight) : dest(dest), weight(weight) {}
+    string origin, dest;
+    int weight;
+    Edge(string origin, string dest, int weight) : origin(origin), dest(dest), weight(weight) {}
 };
 
 struct Visit {
@@ -425,7 +426,16 @@ bool isVisited(vector<Visit>& visited, string vertex) {
     return false;
 }
 
-vector<pair<pair<string, string>, int>> prim(Graph* graph) {
+bool isAllVisited(vector<Visit>& visited) {
+    for (int i = 0; i < visited.size(); i++) {
+        if (!visited[i].visited) {
+            return false;
+        }
+    }
+    return true;
+}
+
+void prim(Graph* graph) {
     AVLNode* root = graph->getRoot();
     int numVertices = size(root);
     vector<pair<pair<string, string>, int>> mst;
@@ -456,7 +466,17 @@ vector<pair<pair<string, string>, int>> prim(Graph* graph) {
             
         }
     }
-    return mst;
+    cout << "Minimal Spanning Tree:" << endl;
+    int total = 0;
+    for (int i = 0; i < mst.size(); i++) {
+        cout << mst[i].first.first << " - " << mst[i].first.second << " " << mst[i].second << endl;
+        total += mst[i].second;
+    }
+    cout << "Total cost of MST: " << total << endl;
+    if (!isAllVisited(visited)) {
+        cout << "The Graph Is Not Connected" << endl;
+    }
+    return;
 }
 
 void printMST(vector<pair<pair<string, string>, int>> mst) {
@@ -470,11 +490,9 @@ int main(){
     Graph* airports = graphs->airports;
     Graph* undirectedAirports = graphs->undirectedAirports;
 
-    vector<pair<pair<string, string>, int>> mst = prim(undirectedAirports);
+    prim(undirectedAirports);
     
-    for (int i = 0; i < mst.size(); i++) {
-        cout << mst[i].first.first << " " << mst[i].first.second << " " << mst[i].second << endl;
-    }
+    
     
     return 0;
 }
