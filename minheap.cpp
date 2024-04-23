@@ -4,6 +4,7 @@
 
 struct SearchNode {
     std::string code;
+    std::string origin;
     int distance{};
     bool visited{};
     int stops{};
@@ -25,6 +26,20 @@ public:
         delete[] arr;
     }
 
+    void insert(std::string str, std::string origin, int dist) {
+        if (size == capacity) {
+            std::cout << "Minheap Overflow" << std::endl;
+            return;
+        }
+
+        arr[size].code = str;
+        arr[size].origin = origin;
+        arr[size].distance = dist;
+        size++;
+
+        percolateUp(size - 1);
+    }
+
     void insert(std::string str, int dist) {
         if (size == capacity) {
             std::cout << "Minheap Overflow" << std::endl;
@@ -32,6 +47,7 @@ public:
         }
 
         arr[size].code = str;
+
         arr[size].distance = dist;
         size++;
 
@@ -100,6 +116,11 @@ public:
             percolateDown(0);
         }
 
+        if (size <= 0) {
+        std::cout << "All nodes are visited" << std::endl;
+        return SearchNode(); // Assuming SearchNode() creates a default node
+        }
+
         SearchNode min = arr[0];
         arr[0] = arr[size - 1];
         size--;
@@ -114,6 +135,15 @@ public:
                 return;
             }
         }
+    }
+
+    bool isVisited(std::string code) {
+        for (int i = 0; i < size; i++) {
+            if (arr[i].code == code) {
+                return arr[i].visited;
+            }
+        }
+        return false;
     }
 
 };

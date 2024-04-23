@@ -390,26 +390,115 @@ void shortestPathWithStops(std::string src, std::string dest, int numStops, Grap
 //End Shortest Path's
 
 
-Graph* primsAlgorithm(Graph airports) {
-    Graph* mst = new Graph();
-    int cost = 0;
-    AVLNode* root = airports.getRoot();
-    int totalAirports = size(root);
-    MinHeap* heap = new MinHeap(totalAirports);
-    SearchNode min;
-    heap->insert(root->airport.code, 0);
-    while(heap->size != 0) {
-        min = heap->popMin();
-        cost += min.distance;
-        mst->addAirport(root->airport);
-        mst->addConnectionUndirected(searchAirport(mst->getRoot(), min.code), root, min.distance, 0);
-        root = searchAirport(airports.getRoot(), min.code);
-        heap->visit(min.code);
-        for(int i = 0; i < root->airport.connections.size(); i++) {
-            heap->insert(root->airport.connections[i]->airport.code, root->airport.costs[i]);
+
+struct Edge {
+    string origin, dest;
+    int weight;
+    Edge(string origin, string dest, int weight) : origin(origin), dest(dest), weight(weight) {}
+};
+
+struct Visit {
+    string vertex;
+    bool visited;
+    Visit(string vertex, bool visited) : vertex(vertex), visited(visited) {}
+};
+
+void traverseAndAdd(AVLNode* node, vector<Visit>& visited) {
+    if (node == nullptr) {
+        return;
+    }
+    Visit visit(node->airport.code, false);
+    visited.push_back(visit);
+
+    traverseAndAdd(node->left, visited);
+    traverseAndAdd(node->right, visited);
+}
+
+vector<Visit> addValuesToVisited(Graph* graph) {
+    vector<Visit> visited;
+
+    AVLNode* root = graph->getRoot();
+
+    traverseAndAdd(root, visited);
+
+    return visited;
+}
+
+void visit(vector<Visit>& visited, string vertex) {
+    for (int i = 0; i < visited.size(); i++) {
+        if (visited[i].vertex == vertex) {
+            visited[i].visited = true;
+            return;
         }
     }
-    return mst;
+}
+
+bool isVisited(vector<Visit>& visited, string vertex) {
+    for (int i = 0; i < visited.size(); i++) {
+        if (visited[i].vertex == vertex) {
+            return visited[i].visited;
+        }
+    }
+    return false;
+}
+
+bool isAllVisited(vector<Visit>& visited) {
+    for (int i = 0; i < visited.size(); i++) {
+        if (!visited[i].visited) {
+            return false;
+        }
+    }
+    return true;
+}
+
+void prim(Graph* graph) {
+    AVLNode* root = graph->getRoot();
+    int numVertices = size(root);
+    vector<pair<pair<string, string>, int>> mst;
+    vector<Visit> visited;
+    MinHeap* heap = new MinHeap(numVertices * numVertices);
+    visited = addValuesToVisited(graph);
+    visit(visited, root->airport.code);
+
+    for (int i = 0; i < root->airport.connections.size(); i++) {
+        heap->insert(root->airport.connections[i]->airport.code, root->airport.code, root->airport.costs[i]);
+    }
+    while (!heap->isEmpty()) {
+        SearchNode minNode = heap->getMin();
+
+        string origin = minNode.origin;
+        string dest = minNode.code;
+
+        if (!isVisited(visited, dest)) {
+            mst.push_back({{origin, dest}, minNode.distance});
+            visit(visited, dest);
+
+            AVLNode* curNode = searchAirport(graph->getRoot(), dest);
+            for (int i = 0; i < curNode->airport.connections.size(); i++) {
+                if (!isVisited(visited, curNode->airport.connections[i]->airport.code)) {
+                    heap->insert(curNode->airport.connections[i]->airport.code, curNode->airport.code, curNode->airport.costs[i]);
+                }
+            }
+
+        }
+    }
+    cout << "Minimal Spanning Tree:" << endl;
+    int total = 0;
+    for (int i = 0; i < mst.size(); i++) {
+        cout << mst[i].first.first << " - " << mst[i].first.second << " " << mst[i].second << endl;
+        total += mst[i].second;
+    }
+    cout << "Total cost of MST: " << total << endl;
+    if (!isAllVisited(visited)) {
+        cout << "The Graph Is Not Connected" << endl;
+    }
+    return;
+}
+
+void printMST(vector<pair<pair<string, string>, int>> mst) {
+    for (int i = 0; i < mst.size(); i++) {
+        cout << mst[i].first.first << " " << mst[i].first.second << " " << mst[i].second << endl;
+    }
 }
 
 int main(){
@@ -418,6 +507,10 @@ int main(){
     Graph* undirectedAirports = graphs->undirectedAirports;
     AVLNode* root = airports->getRoot();
     totalFlightConnections(airports, root);
+
+    prim(undirectedAirports);
+
+
 
     //shortestPathWithStops("MIA", "DTW", 3, airports);
 //    shortestPathToState("MIA", "IL", airports);
