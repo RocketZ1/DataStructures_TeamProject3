@@ -516,14 +516,15 @@ if (!isAllVisited(visited)) {
 // End Prim's Algorithm
 
 // Kruskal's Algorithm
-vector<Edge> getEdges(Graph* graph) {
-    AVLNode* root = graph->getRoot();
+vector<Edge> getEdges(AVLNode* root) {
     vector<Edge> edges;
+    int k = 0;
     for (int i = 0; i < root->airport.connections.size(); i++) {
         edges.push_back(Edge(root->airport.code, root->airport.connections[i]->airport.code, root->airport.costs[i]));
     }
     return edges;
 }
+
 void sortEdges(vector<Edge>& edges) {
     for(int i = 0; i < edges.size(); i++) {
         for(int j = 0; j < edges.size() - 1; j++) {

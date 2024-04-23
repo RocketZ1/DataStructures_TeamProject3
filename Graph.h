@@ -4,7 +4,7 @@
 #include "AVL.h"
 
 using namespace std;
-
+// Graph class
 class Graph {
 private:
     AVLNode* adjacencyList;

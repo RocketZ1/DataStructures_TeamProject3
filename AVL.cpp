@@ -5,7 +5,7 @@
 
 
 using namespace std;
-
+// Returns the height of the AVL tree
 int height(AVLNode* N) {
     if (N == NULL)
         return 0;
@@ -15,7 +15,7 @@ int height(AVLNode* N) {
 int max(int a, int b) {
     return (a > b) ? a : b;
 }
-
+// Creates a new node with the given airport
 AVLNode* newNode(Airport airport) {
     AVLNode* node = new AVLNode();
     node->airport = airport;
@@ -25,6 +25,7 @@ AVLNode* newNode(Airport airport) {
     return(node);
 }
 
+// Rotates the AVL tree to the right
 AVLNode* rightRotate(AVLNode* y) {
     AVLNode* x = y->left;
     AVLNode* T2 = x->right;
@@ -38,6 +39,7 @@ AVLNode* rightRotate(AVLNode* y) {
     return x;
 }
 
+// Rotates the AVL tree to the left
 AVLNode* leftRotate(AVLNode* x) {
     AVLNode* y = x->right;
     AVLNode* T2 = y->left;
@@ -51,16 +53,18 @@ AVLNode* leftRotate(AVLNode* x) {
     return y;
 }
 
+// Returns the balance of the AVL tree
 int getBalance(AVLNode* N) {
     if (N == NULL)
         return 0;
     return height(N->left) - height(N->right);
 }
 
+// Inserts an airport into the AVL tree
 AVLNode* insertAirport(AVLNode* node, Airport airport) {
     if (node == NULL)
         return(newNode(airport));
-
+    // Insert the airport into the AVL tree
     if (airport.code < node->airport.code)
         node->left = insertAirport(node->left, airport);
     else if (airport.code > node->airport.code)
@@ -72,6 +76,7 @@ AVLNode* insertAirport(AVLNode* node, Airport airport) {
 
     int balance = getBalance(node);
 
+    // Determine the rotation needed
     if (balance > 1 && airport.code < node->left->airport.code)
         return rightRotate(node);
 
@@ -91,6 +96,7 @@ AVLNode* insertAirport(AVLNode* node, Airport airport) {
     return node;
 }
 
+// Searches for an airport in the AVL tree
 AVLNode* searchAirport(AVLNode* node, string code) {
     if (node == NULL || node->airport.code == code)
         return node;
@@ -101,6 +107,7 @@ AVLNode* searchAirport(AVLNode* node, string code) {
         return searchAirport(node->left, code);
 }
 
+// Traverses the AVL tree in order
 void inorderTraversal(AVLNode* root) {
     if (root != NULL) {
         inorderTraversal(root->left);
@@ -109,6 +116,7 @@ void inorderTraversal(AVLNode* root) {
     }
 }
 
+// Pushes the airport codes to a vector
 void pushAirportCodesToVector(AVLNode* root, std::vector<SearchNode>& v) {
     if (root != NULL) {
         pushAirportCodesToVector(root->left, v);
@@ -119,6 +127,7 @@ void pushAirportCodesToVector(AVLNode* root, std::vector<SearchNode>& v) {
     }
 }
 
+// Returns the size of the AVL tree
 int size(AVLNode* root) {
     if (root == NULL) {
         return 0;

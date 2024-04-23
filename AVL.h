@@ -8,6 +8,7 @@ using namespace std;
 
 class AVLNode;
 
+// A structure to represent an airport
 struct Airport {
     string code;
     string city;
@@ -16,6 +17,7 @@ struct Airport {
     vector<int> costs;
 };
 
+// A structure to represent a node in the AVL tree
 class AVLNode {
 public:
     Airport airport;

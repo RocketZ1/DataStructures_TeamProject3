@@ -2,6 +2,7 @@
 #include <iostream>
 #include <utility>
 
+// A structure to represent a node in the min heap
 struct SearchNode {
     std::string code;
     std::string origin;
@@ -25,7 +26,7 @@ public:
     ~MinHeap() {
         delete[] arr;
     }
-
+    // Insert a node with a given code, origin, and distance
     void insert(std::string str, std::string origin, int dist) {
         if (size == capacity) {
             std::cout << "Minheap Overflow" << std::endl;
@@ -39,7 +40,7 @@ public:
 
         percolateUp(size - 1);
     }
-
+    // Insert a node with a given code and distance
     void insert(std::string str, int dist) {
         if (size == capacity) {
             std::cout << "Minheap Overflow" << std::endl;
@@ -53,7 +54,7 @@ public:
 
         percolateUp(size - 1);
     }
-
+    
     void percolateUp(int index) {
         while (index > 0 && arr[(index - 1) / 2].distance > arr[index].distance) {
             swap(index, (index - 1) / 2);
@@ -66,7 +67,7 @@ public:
         arr[i] = arr[j];
         arr[j] = temp;
     }
-
+    // get the index of the minimum value
     int minimum(int a, int indexa, int b, int indexb) {
         return (a < b) ? indexa : indexb;
     }
@@ -79,7 +80,7 @@ public:
             index = minChildIndex;
         }
     }
-
+    // Get the minimum node
     SearchNode getMin() {
         if (size <= 0) {
             std::cout << "Heap is empty" << std::endl;
@@ -99,17 +100,17 @@ public:
 
         return minNode;
     }
-
+    // Check if the heap is empty
     bool isEmpty() {
         return (size <= 0);
     }
-
+    // Visit all nodes with the given code
     SearchNode popMin() {
         if (size <= 0) {
             std::cout << "Heap is empty" << std::endl;
             return SearchNode();
         }
-
+        // Remove the visited nodes
         while(arr[0].visited) {
             arr[0] = arr[size - 1];
             size--;
@@ -128,6 +129,7 @@ public:
 
         return min;
     }
+    // Visit all nodes with the given code
     void visit (std::string code) {
         for (int i = 0; i < size; i++) {
             if (arr[i].code == code) {
@@ -136,7 +138,7 @@ public:
             }
         }
     }
-
+    // Check if the node is visited
     bool isVisited(std::string code) {
         for (int i = 0; i < size; i++) {
             if (arr[i].code == code) {
