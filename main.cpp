@@ -520,13 +520,15 @@ int main(){
     Graph* airports = graphs->airports;
     Graph* undirectedAirports = graphs->undirectedAirports;
     AVLNode* root = airports->getRoot();
+    
 
     shortestPath("IAD", "MIA", airports);
     shortestPath("PIT", "ACT", airports);
     shortestPathToState("MIA", "IL", airports);
     shortestPathWithStops("IAD", "MIA", 3, airports);
     shortestPathWithStops("PIT", "ACT", 2, airports);
-    //totalFlightConnections(airports, root);
+    totalFlightConnections(airports, root);
+    
     prim(undirectedAirports);
 
 
