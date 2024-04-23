@@ -1,8 +1,9 @@
 #include <iostream>
 #include <fstream>
+#include <algorithm> //for std::reverse
 #include "Graph.h"
 using namespace std;
-#define MAX_DIST 5000;
+#define MAX_DIST 5000
 struct Graphs {
     Graph* airports;
     Graph* undirectedAirports;
@@ -58,12 +59,12 @@ Graphs * readCSV() {
 
 // Prompt #5
 void findConnections(AVLNode* root, vector<AVLNode*> *inboundAirports, string &code){
-    if (root != nullptr) {
+    if (root != nullptr && !root->airport.code.empty()) {
         findConnections(root->left, inboundAirports, code);
 
         for(AVLNode * airport : root->airport.connections){
             if(airport->airport.code == code){
-                inboundAirports->push_back(airport);
+                inboundAirports->push_back(root);
             }
         }
 
@@ -71,14 +72,28 @@ void findConnections(AVLNode* root, vector<AVLNode*> *inboundAirports, string &c
     }
 }
 
-void totalFlightConnections(Graph* graph, AVLNode* root){
-    if (root != nullptr) {
-        totalFlightConnections(graph, root->left);
+struct totalFlightConnectionHelperStruct {
+    string code;
+    vector<AVLNode*> outboundAirports;
+    vector<AVLNode*> *inboundAirports;
+};
+
+totalFlightConnectionHelperStruct* totalFlightConnectionsHelper(Graph* graph, AVLNode* root, vector<totalFlightConnectionHelperStruct*>* flightConnectionsContainer){
+    if (root != nullptr && !root->airport.code.empty()) {
+        totalFlightConnectionsHelper(graph, root->left, flightConnectionsContainer);
+
+        if(root->airport.code == "BOS"){
+            cout << "";
+        }
 
         cout << root->airport.code << endl;
         vector<AVLNode*> outboundAirports = root->airport.connections;
         vector<AVLNode*> *inboundAirports = new vector<AVLNode*>;
         findConnections(graph->getRoot(), inboundAirports, root->airport.code);
+        totalFlightConnectionHelperStruct* container = new totalFlightConnectionHelperStruct
+                {root->airport.code, outboundAirports, inboundAirports};
+        flightConnectionsContainer->push_back(container);
+
         cout << "Outbound Flights: ";
         for(AVLNode * outboundAirport : outboundAirports){
             cout << outboundAirport->airport.code << " ";
@@ -89,16 +104,19 @@ void totalFlightConnections(Graph* graph, AVLNode* root){
             cout << inboundAirport->airport.code << " ";
         }
         cout << endl << endl;
-        totalFlightConnections(graph, root->right);
+        totalFlightConnectionsHelper(graph, root->right, flightConnectionsContainer);
     }
+}
+
+void totalFlightConnections(Graph* graph, AVLNode* root){
+    vector<totalFlightConnectionHelperStruct*>* flightConnections = new vector<totalFlightConnectionHelperStruct*>;
+    totalFlightConnectionsHelper(graph, root, flightConnections);
+    cout << flightConnections->size();
 }
 
 // End prompt #5
 
 //Shortest Paths:
-
-//Call shortest path on every airport in destState
-
 
 int findIndexOfCode(const std::vector<SearchNode>& nodes, std::string codeToFind) {
     for (int i = 0; i < nodes.size(); i++) {
@@ -107,7 +125,24 @@ int findIndexOfCode(const std::vector<SearchNode>& nodes, std::string codeToFind
     }
     return -1;
 }
+void getPathIterative(std::vector<int>& parent, int destIndex, std::vector<SearchNode>& nodes, std::vector<string>& output) {
+    // Start from the destination node
+    int currentIndex = destIndex;
 
+    // Traverse back using parent pointers until reaching the source node
+    while (currentIndex != -1) {
+
+
+        // Add the code of the current node to the output
+        output.push_back(nodes[currentIndex].code);
+
+        // Move to the parent node
+        currentIndex = parent[currentIndex];
+    }
+
+    // Reverse the output
+    std::reverse(output.begin(), output.end());
+}
 // Helper function to get shortest path from source to j
 void getPath(std::vector<int>& parent, int j, std::vector<SearchNode>& nodes, std::vector<string>& output) {
     // Base Case: If j is source
@@ -137,7 +172,7 @@ int getTotalCost(vector<string> pathCodes, Graph* graph) {
 
 void shortestPath(std::string src, std::string dest, Graph* graph) {
     std::vector<SearchNode> nodes; // Vector to hold all airport codes
-    MinHeap* heap = new MinHeap(140); // Assuming 140 total airports
+    MinHeap* heap = new MinHeap(size(graph->getRoot()));
 
     // Adds all node names (airport codes) to the vector
     pushAirportCodesToVector(graph->getRoot(), nodes);
@@ -228,12 +263,113 @@ void shortestPathToStateHelper(AVLNode* node, string src, string destState, Grap
     shortestPathToStateHelper(node->right, src, destState, graph);
 }
 
+//Call shortest path on every airport in destState
 void shortestPathToState(string src, string dest, Graph* graph) {
     //Extract state
+
     string destState = dest.substr(dest.length() - 2);
+    cout << "The shortest paths from " << src << " to " << destState << " are:" << endl;
     shortestPathToStateHelper(graph->getRoot(), src, destState, graph);
 }
 
+void shortestPathWithStops(std::string src, std::string dest, int numStops, Graph* graph) {
+    std::vector<SearchNode> nodes; // Vector to hold all airport codes
+    MinHeap* heap = new MinHeap(140); // Assuming 140 total airports
+
+    // Adds all node names (airport codes) to the vector
+    pushAirportCodesToVector(graph->getRoot(), nodes);
+
+    // Initialize all nodes with distance as MAX_DIST and unvisited
+    for (int i = 0; i < nodes.size(); i++) {
+        nodes[i].distance = MAX_DIST;
+        nodes[i].visited = false;
+    }
+
+    // Set distance of source node to 0, stops = 0
+    int curIndex = findIndexOfCode(nodes, src);
+    nodes[curIndex].distance = 0;
+    nodes[curIndex].stops = 0;
+
+    // Add the source node to the min heap
+    heap->insert(nodes[curIndex].code, nodes[curIndex].distance);
+
+    // Parent array to store the parent of each node on the shortest path tree
+    std::vector<int> parent(nodes.size(), -1);
+
+    // Dijkstra's algorithm
+    while (!heap->isEmpty()) {
+        // Get current node by choosing the node with minimum cost from the heap
+        AVLNode* curNode = searchAirport(graph->getRoot(), heap->getMin().code);
+        curIndex = findIndexOfCode(nodes, curNode->airport.code);
+
+        // Update distances in the nodes vector if a shorter path is found
+        for (int i = 0; i < curNode->airport.connections.size(); i++) {
+            AVLNode* connectionNode = curNode->airport.connections[i];
+            int indexOfConnection = findIndexOfCode(nodes, connectionNode->airport.code);
+
+            // Ignore connection if it has been visited
+            if (nodes[indexOfConnection].visited) {
+                continue;
+            }
+
+
+            //Set the connection stop number to be curStops + 1, unless its the dest node
+            int curStops = nodes[curIndex].stops;
+            //Make this path unavailable if this is true
+            if (connectionNode->airport.code == dest && curStops != numStops) {
+                continue;
+            }
+            else if (connectionNode->airport.code == dest) {
+                nodes[indexOfConnection].stops = curStops;
+            }
+            else {
+                nodes[indexOfConnection].stops = curStops + 1;
+            }
+
+
+
+            // If distance to reach curNode + distance to reach connectionNode < its current cost
+            int newDistance = nodes[curIndex].distance + curNode->airport.distances[i];
+            if (newDistance < nodes[indexOfConnection].distance) {
+                nodes[indexOfConnection].distance = newDistance;
+                heap->insert(connectionNode->airport.code, newDistance);
+
+                // Update parent of connectionNode
+                parent[indexOfConnection] = curIndex;
+            }
+
+
+        }
+
+        // Mark current node as visited after checking all connections
+        nodes[curIndex].visited = true;
+    }
+
+    // Print the shortest path from src to dest
+    vector<string> pathStrings;
+    int destIndex = findIndexOfCode(nodes, dest);
+    getPath(parent, destIndex, nodes, pathStrings);
+    string outputString;
+
+    if (nodes[destIndex].distance != MAX_DIST) {
+        cout << "Shortest route from " << src << " to " << dest << ": ";
+
+        for (string code : pathStrings) {
+            if (code == dest) {
+                outputString += code;
+                continue;
+            }
+            outputString += code + "->";
+
+        }
+        cout << outputString << endl;
+        cout << "The length is " << nodes[destIndex].distance << ". The cost is " << getTotalCost(pathStrings, graph) << ". " << "Number of stops: " << numStops << std::endl;
+    }
+
+    else {
+        std::cout << "Shortest route from " << src << " to " << dest << ": None" << std::endl;
+    }
+}
 
 //End Shortest Path's
 
@@ -330,36 +466,10 @@ void printMST(vector<pair<pair<string, string>, int>> mst) {
 }
 
 int main(){
-
-
     Graphs* graphs = readCSV();
     Graph* airports = graphs->airports;
     Graph* undirectedAirports = graphs->undirectedAirports;
-    AVLNode* root = airports->getRoot();
-//    cout << root->airport.code << std::endl;
-//    cout << root->airport.city << std::endl;
-//    cout << root->airport.connections[0]->airport.code << std::endl;
-//    cout << root->airport.connections[0]->airport.city << std::endl;
-//    cout << root->airport.distances[0] << std::endl;
-//    cout << root->airport.costs[0] << std::endl;
-//    root = undirectedAirports->getRoot();
-//    cout << root->airport.code << std::endl;
-//    cout << root->airport.city << std::endl;
-//    cout << root->airport.connections[0]->airport.code << std::endl;
-//    cout << root->airport.connections[0]->airport.city << std::endl;
-//    cout << root->airport.distances[0] << std::endl;
-//    cout << root->airport.costs[0] << std::endl;
 
-
-    //shortestPathToState("MIA", "IL", airports);
-    //totalFlightConnections(airports, root);
-//    cout << root->airport.code << std::endl;
-//    cout << root->airport.city << std::endl;
-//    cout << root->airport.connections[0]->airport.code << std::endl;
-//    cout << root->airport.connections[0]->airport.city << std::endl;
-//    cout << root->airport.distances[0] << std::endl;
-//    cout << root->airport.costs[0] << std::endl;
-    // totalFlightConnections(mst, mst->getRoot());
     vector<pair<pair<string, string>, int>> mst = prim(undirectedAirports);
     
     for (int i = 0; i < mst.size(); i++) {
