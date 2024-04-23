@@ -12,7 +12,7 @@ struct Graphs {
 
 // Returns the AVL Graph
 Graphs * readCSV() {
-    ifstream fileIn("C:\\Users\\Zane\\Desktop\\Development\\C++\\DataStructures_TeamProject3\\airports.csv");
+    ifstream fileIn("C:\\Users\\JJord\\Team Project\\DataStructures_TeamProject3\\airports.csv");
     string lineText;
     //Airport object
     Graph* airports = new Graph();
@@ -80,7 +80,7 @@ struct totalFlightConnectionHelperStruct {
     bool beenPrinted = false;
 };
 
-totalFlightConnectionHelperStruct* totalFlightConnectionsHelper(Graph* graph, AVLNode* root, vector<totalFlightConnectionHelperStruct*>* flightConnectionsContainer){
+void totalFlightConnectionsHelper(Graph* graph, AVLNode* root, vector<totalFlightConnectionHelperStruct*>* flightConnectionsContainer){
     if (root != nullptr && !root->airport.code.empty()) {
         totalFlightConnectionsHelper(graph, root->left, flightConnectionsContainer);
 
