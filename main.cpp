@@ -10,7 +10,7 @@ struct Graphs {
 
 // Returns the AVL Graph
 Graphs * readCSV() {
-    ifstream fileIn(R"(C:\Users\VenaFL\Downloads\DataStructures_TeamProject3\DataStructures_TeamProject3\airports.csv)");
+    ifstream fileIn("airports.csv");
     string lineText;
     //Airport object
     Graph* airports = new Graph();
@@ -238,26 +238,95 @@ void shortestPathToState(string src, string dest, Graph* graph) {
 //End Shortest Path's
 
 
-Graph* primsAlgorithm(Graph airports) {
-    Graph* mst = new Graph();
-    int cost = 0;
-    AVLNode* root = airports.getRoot();
-    int totalAirports = size(root);
-    MinHeap* heap = new MinHeap(totalAirports);
-    SearchNode min;
-    heap->insert(root->airport.code, 0);
-    while(heap->size != 0) {
-        min = heap->popMin();
-        cost += min.distance;
-        mst->addAirport(root->airport);
-        mst->addConnectionUndirected(searchAirport(mst->getRoot(), min.code), root, min.distance, 0);
-        root = searchAirport(airports.getRoot(), min.code);
-        heap->visit(min.code);
-        for(int i = 0; i < root->airport.connections.size(); i++) {
-            heap->insert(root->airport.connections[i]->airport.code, root->airport.costs[i]);
+
+struct Edge {
+    int dest, weight;
+    Edge(int dest, int weight) : dest(dest), weight(weight) {}
+};
+
+struct Visit {
+    string vertex;
+    bool visited;
+    Visit(string vertex, bool visited) : vertex(vertex), visited(visited) {}
+};
+
+void traverseAndAdd(AVLNode* node, vector<Visit>& visited) {
+    if (node == nullptr) {
+        return;
+    }
+    Visit visit(node->airport.code, false);
+    visited.push_back(visit);
+
+    traverseAndAdd(node->left, visited);
+    traverseAndAdd(node->right, visited);
+}
+
+vector<Visit> addValuesToVisited(Graph* graph) {
+    vector<Visit> visited;
+
+    AVLNode* root = graph->getRoot();
+
+    traverseAndAdd(root, visited);
+
+    return visited;
+}
+
+void visit(vector<Visit>& visited, string vertex) {
+    for (int i = 0; i < visited.size(); i++) {
+        if (visited[i].vertex == vertex) {
+            visited[i].visited = true;
+            return;
+        }
+    }
+}
+
+bool isVisited(vector<Visit>& visited, string vertex) {
+    for (int i = 0; i < visited.size(); i++) {
+        if (visited[i].vertex == vertex) {
+            return visited[i].visited;
+        }
+    }
+    return false;
+}
+
+vector<pair<pair<string, string>, int>> prim(Graph* graph) {
+    AVLNode* root = graph->getRoot();
+    int numVertices = size(root);
+    vector<pair<pair<string, string>, int>> mst;
+    vector<Visit> visited;
+    MinHeap* heap = new MinHeap(numVertices * numVertices);
+    visited = addValuesToVisited(graph);
+    visit(visited, root->airport.code);
+
+    for (int i = 0; i < root->airport.connections.size(); i++) {
+        heap->insert(root->airport.connections[i]->airport.code, root->airport.code, root->airport.costs[i]);
+    }
+    while (!heap->isEmpty()) {
+        SearchNode minNode = heap->getMin();
+        
+        string origin = minNode.origin;
+        string dest = minNode.code;
+
+        if (!isVisited(visited, dest)) {
+            mst.push_back({{origin, dest}, minNode.distance});
+            visit(visited, dest);
+
+            AVLNode* curNode = searchAirport(graph->getRoot(), dest);
+            for (int i = 0; i < curNode->airport.connections.size(); i++) {
+                if (!isVisited(visited, curNode->airport.connections[i]->airport.code)) {
+                    heap->insert(curNode->airport.connections[i]->airport.code, curNode->airport.code, curNode->airport.costs[i]);
+                }
+            }
+            
         }
     }
     return mst;
+}
+
+void printMST(vector<pair<pair<string, string>, int>> mst) {
+    for (int i = 0; i < mst.size(); i++) {
+        cout << mst[i].first.first << " " << mst[i].first.second << " " << mst[i].second << endl;
+    }
 }
 
 int main(){
@@ -282,7 +351,7 @@ int main(){
 //    cout << root->airport.costs[0] << std::endl;
 
 
-    shortestPathToState("MIA", "IL", airports);
+    //shortestPathToState("MIA", "IL", airports);
     //totalFlightConnections(airports, root);
 //    cout << root->airport.code << std::endl;
 //    cout << root->airport.city << std::endl;
@@ -290,5 +359,12 @@ int main(){
 //    cout << root->airport.connections[0]->airport.city << std::endl;
 //    cout << root->airport.distances[0] << std::endl;
 //    cout << root->airport.costs[0] << std::endl;
+    // totalFlightConnections(mst, mst->getRoot());
+    vector<pair<pair<string, string>, int>> mst = prim(undirectedAirports);
+    
+    for (int i = 0; i < mst.size(); i++) {
+        cout << mst[i].first.first << " " << mst[i].first.second << " " << mst[i].second << endl;
+    }
+    
     return 0;
 }
