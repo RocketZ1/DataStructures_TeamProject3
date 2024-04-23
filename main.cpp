@@ -515,6 +515,45 @@ if (!isAllVisited(visited)) {
 
 // End Prim's Algorithm
 
+// Kruskal's Algorithm
+vector<Edge> getEdges(Graph* graph) {
+    AVLNode* root = graph->getRoot();
+    vector<Edge> edges;
+    for (int i = 0; i < root->airport.connections.size(); i++) {
+        edges.push_back(Edge(root->airport.code, root->airport.connections[i]->airport.code, root->airport.costs[i]));
+    }
+    return edges;
+}
+void sortEdges(vector<Edge>& edges) {
+    for(int i = 0; i < edges.size(); i++) {
+        for(int j = 0; j < edges.size() - 1; j++) {
+            if(edges[j].weight > edges[j + 1].weight) {
+                swap(edges[j], edges[j + 1]);
+            }
+        }
+    }
+}
+bool in(vector<pair<string, string>> sets, string vertex) {
+    for (int i = 0; i < sets.size(); i++) {
+        if (sets[i].first == vertex) {
+            return true;
+        }
+    }
+    return false;
+}
+/*
+void kruskal(vector<Edge>* edges)
+{
+    vector<Edge> mst;
+    vector<pair<string, string>> sets;
+
+    for (int i = 0; i < edges->size(); i++) {
+        if (!in(sets, edges[i].origin)){
+            sets.push_back({edges[i].origin, edges[i].origin});
+        }
+    }
+}
+*/
 int main(){
     Graphs* graphs = readCSV();
     Graph* airports = graphs->airports;
