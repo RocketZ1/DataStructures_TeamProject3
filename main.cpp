@@ -10,7 +10,7 @@ struct Graphs {
 
 // Returns the AVL Graph
 Graphs * readCSV() {
-    ifstream fileIn(R"(C:\Users\Zane\Desktop\Development\C++\DataStructures_TeamProject3\airports.csv)");
+    ifstream fileIn(R"(C:\Users\VenaFL\Downloads\DataStructures_TeamProject3\DataStructures_TeamProject3\airports.csv)");
     string lineText;
     //Airport object
     Graph* airports = new Graph();
@@ -96,6 +96,9 @@ void totalFlightConnections(Graph* graph, AVLNode* root){
 // End prompt #5
 
 //Shortest Paths:
+
+//Call shortest path on every airport in destState
+
 
 int findIndexOfCode(const std::vector<SearchNode>& nodes, std::string codeToFind) {
     for (int i = 0; i < nodes.size(); i++) {
@@ -212,6 +215,28 @@ void shortestPath(std::string src, std::string dest, Graph* graph) {
     }
 }
 
+void shortestPathToStateHelper(AVLNode* node, string src, string destState, Graph* graph) {
+    if (node == NULL || node->airport.city.length() < 2)
+        return;
+
+    string nodeState = node->airport.city.substr(node->airport.city.length() - 2);
+    if (nodeState == destState) {
+        shortestPath(src,node->airport.code, graph);
+        cout << endl;
+    }
+    shortestPathToStateHelper(node->left, src, destState, graph);
+    shortestPathToStateHelper(node->right, src, destState, graph);
+}
+
+void shortestPathToState(string src, string dest, Graph* graph) {
+    //Extract state
+    string destState = dest.substr(dest.length() - 2);
+    shortestPathToStateHelper(graph->getRoot(), src, destState, graph);
+}
+
+
+//End Shortest Path's
+
 
 Graph* primsAlgorithm(Graph airports) {
     Graph* mst = new Graph();
@@ -236,27 +261,29 @@ Graph* primsAlgorithm(Graph airports) {
 }
 
 int main(){
-    Graphs * graphs = readCSV();
+
+
+    Graphs* graphs = readCSV();
     Graph* airports = graphs->airports;
     Graph* undirectedAirports = graphs->undirectedAirports;
     AVLNode* root = airports->getRoot();
-    cout << root->airport.code << std::endl;
-    cout << root->airport.city << std::endl;
-    cout << root->airport.connections[0]->airport.code << std::endl;
-    cout << root->airport.connections[0]->airport.city << std::endl;
-    cout << root->airport.distances[0] << std::endl;
-    cout << root->airport.costs[0] << std::endl;
-    root = undirectedAirports->getRoot();
-    cout << root->airport.code << std::endl;
-    cout << root->airport.city << std::endl;
-    cout << root->airport.connections[0]->airport.code << std::endl;
-    cout << root->airport.connections[0]->airport.city << std::endl;
-    cout << root->airport.distances[0] << std::endl;
-    cout << root->airport.costs[0] << std::endl;
+//    cout << root->airport.code << std::endl;
+//    cout << root->airport.city << std::endl;
+//    cout << root->airport.connections[0]->airport.code << std::endl;
+//    cout << root->airport.connections[0]->airport.city << std::endl;
+//    cout << root->airport.distances[0] << std::endl;
+//    cout << root->airport.costs[0] << std::endl;
+//    root = undirectedAirports->getRoot();
+//    cout << root->airport.code << std::endl;
+//    cout << root->airport.city << std::endl;
+//    cout << root->airport.connections[0]->airport.code << std::endl;
+//    cout << root->airport.connections[0]->airport.city << std::endl;
+//    cout << root->airport.distances[0] << std::endl;
+//    cout << root->airport.costs[0] << std::endl;
 
 
-
-    totalFlightConnections(airports, root);
+    shortestPathToState("MIA", "IL", airports);
+    //totalFlightConnections(airports, root);
 //    cout << root->airport.code << std::endl;
 //    cout << root->airport.city << std::endl;
 //    cout << root->airport.connections[0]->airport.code << std::endl;

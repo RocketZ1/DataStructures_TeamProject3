@@ -68,12 +68,12 @@ public:
             std::cout << "Heap is empty" << std::endl;
             throw 505;
         }
-        
-        while(arr[0].visited) {
-            arr[0] = arr[size - 1];
-            size--;
-            percolateDown(0);
-        }
+//
+//        while(arr[0].visited) {
+//            arr[0] = arr[size - 1];
+//            size--;
+//            percolateDown(0);
+//        }
 
         SearchNode minNode = arr[0];
         arr[0] = arr[size - 1];
@@ -106,7 +106,7 @@ public:
 
         return min;
     }
-    void visit (string code) {
+    void visit (std::string code) {
         for (int i = 0; i < size; i++) {
             if (arr[i].code == code) {
                 arr[i].visited = true;
