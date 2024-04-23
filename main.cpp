@@ -12,7 +12,7 @@ struct Graphs {
 
 // Returns the AVL Graph
 Graphs * readCSV() {
-    ifstream fileIn(R"(C:\Users\Zane\Desktop\Development\C++\DataStructures_TeamProject3\airports.csv)");
+    ifstream fileIn("airports.csv");
     string lineText;
     //Airport object
     Graph* airports = new Graph();
@@ -520,9 +520,13 @@ int main(){
     Graph* airports = graphs->airports;
     Graph* undirectedAirports = graphs->undirectedAirports;
     AVLNode* root = airports->getRoot();
-    totalFlightConnections(airports, root);
 
+    shortestPath("IAD", "MIA", airports);
+    shortestPath("PIT", "ACT", airports);
     shortestPathToState("MIA", "IL", airports);
+    shortestPathWithStops("IAD", "MIA", 3, airports);
+    shortestPathWithStops("PIT", "ACT", 2, airports);
+    //totalFlightConnections(airports, root);
     prim(undirectedAirports);
 
 
