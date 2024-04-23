@@ -11,7 +11,7 @@ struct Graphs {
 
 // Returns the AVL Graph
 Graphs * readCSV() {
-    ifstream fileIn(R"(C:\Users\VenaFL\Downloads\DataStructures_TeamProject3\DataStructures_TeamProject3\airports.csv)");
+    ifstream fileIn(R"(C:\Users\Zane\Desktop\Development\C++\DataStructures_TeamProject3\airports.csv)");
     string lineText;
     //Airport object
     Graph* airports = new Graph();
@@ -59,12 +59,12 @@ Graphs * readCSV() {
 
 // Prompt #5
 void findConnections(AVLNode* root, vector<AVLNode*> *inboundAirports, string &code){
-    if (root != nullptr) {
+    if (root != nullptr && !root->airport.code.empty()) {
         findConnections(root->left, inboundAirports, code);
 
         for(AVLNode * airport : root->airport.connections){
             if(airport->airport.code == code){
-                inboundAirports->push_back(airport);
+                inboundAirports->push_back(root);
             }
         }
 
@@ -72,14 +72,28 @@ void findConnections(AVLNode* root, vector<AVLNode*> *inboundAirports, string &c
     }
 }
 
-void totalFlightConnections(Graph* graph, AVLNode* root){
-    if (root != nullptr) {
-        totalFlightConnections(graph, root->left);
+struct totalFlightConnectionHelperStruct {
+    string code;
+    vector<AVLNode*> outboundAirports;
+    vector<AVLNode*> *inboundAirports;
+};
+
+totalFlightConnectionHelperStruct* totalFlightConnectionsHelper(Graph* graph, AVLNode* root, vector<totalFlightConnectionHelperStruct*>* flightConnectionsContainer){
+    if (root != nullptr && !root->airport.code.empty()) {
+        totalFlightConnectionsHelper(graph, root->left, flightConnectionsContainer);
+
+        if(root->airport.code == "BOS"){
+            cout << "";
+        }
 
         cout << root->airport.code << endl;
         vector<AVLNode*> outboundAirports = root->airport.connections;
         vector<AVLNode*> *inboundAirports = new vector<AVLNode*>;
         findConnections(graph->getRoot(), inboundAirports, root->airport.code);
+        totalFlightConnectionHelperStruct* container = new totalFlightConnectionHelperStruct
+                {root->airport.code, outboundAirports, inboundAirports};
+        flightConnectionsContainer->push_back(container);
+
         cout << "Outbound Flights: ";
         for(AVLNode * outboundAirport : outboundAirports){
             cout << outboundAirport->airport.code << " ";
@@ -90,8 +104,14 @@ void totalFlightConnections(Graph* graph, AVLNode* root){
             cout << inboundAirport->airport.code << " ";
         }
         cout << endl << endl;
-        totalFlightConnections(graph, root->right);
+        totalFlightConnectionsHelper(graph, root->right, flightConnectionsContainer);
     }
+}
+
+void totalFlightConnections(Graph* graph, AVLNode* root){
+    vector<totalFlightConnectionHelperStruct*>* flightConnections = new vector<totalFlightConnectionHelperStruct*>;
+    totalFlightConnectionsHelper(graph, root, flightConnections);
+    cout << flightConnections->size();
 }
 
 // End prompt #5
